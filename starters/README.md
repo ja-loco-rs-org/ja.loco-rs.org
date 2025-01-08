@@ -1,23 +1,23 @@
-# スターターの概要
+# Starters Overview
 
-Locoスターターは、Locoプロジェクトを開始するための簡単な方法を提供し、ユーザーの労力を最小限に抑え、Locoのシームレスな採用を促進します。
+Loco starters provide a straightforward way to initiate a Loco project, minimizing user effort and facilitating the seamless adoption of Loco.
 
-## 仕組み
+## How It Works
 
-[loco-cli](../loco-cli/README.md)は、実行時にスターターのルートパス内のすべての利用可能なスタータープロジェクトを動的に検索します。その後、ユーザーに利用可能なスターターから選択するように促します。
+The [loco-cli](../loco-cli/README.md) dynamically searches for all available starter projects in the starters root path during runtime. It then prompts the user to choose from the available starters.
 
-スターターは **必ず動作する** 必要があります。ユーザーはこれらのプロジェクトから始めることが多いため、良い第一印象を与えることが重要です。
+Starters **must work**, as users often start with these projects, and it's crucial to provide a positive first impression :).
 
-Locoライブラリの新しいバージョンをリリースする際には、xtaskユーティリティを使用してLocoのバージョンとスターターを自動的に更新し、それらを更新されたバージョンにロックします。
+When releasing a new version of the Loco library, we utilize xtask utilities, which automatically update the Loco version and the starters, locking them to the updated version.
 
-## スターターを更新するタイミング
+## When to Update a Starter
 
-理想的には、スターターに変更を加えることは**避けて**ください。スターターは最小限の実装であるべきです。
+Ideally, **avoid** making changes to the starters. Starters should have minimal implementations.
 
-## 新しいスターターを追加するタイミング
+## When to Add a New Starter
 
-新しいスターターを含むプルリクエスト（PR）をすぐに提出するのではなく、まず[PR](https://github.com/loco-rs/loco/issues/new/choose)を開いて、時間を投資する前に私たちと相談してください。
+We recommend not submitting a pull request (PR) with a new starter right away. Instead, feel free to open a [PR](https://github.com/loco-rs/loco/issues/new/choose) and as and consult with us before investing your time.
 
-## 破壊的変更の処理
+## Handling Breaking Changes
 
-破壊的変更を行う場合、通常はスターターを更新する必要はありません。バージョンアップ時に、スタータープロジェクトを徹底的にテストし、必要に応じて調整を行います。
+When making breaking changes, there is generally no need to update the starters. During version bumps, we thoroughly test the starter projects and make any necessary adjustments if needed.
