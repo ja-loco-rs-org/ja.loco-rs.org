@@ -221,3 +221,10 @@ pub fn router() -> Router {
 pub fn routes() -> Routes {
   Routes::new()
       .add("/auth/register", post(create_user))
+      .add("/auth/login", post(login_user))
+}
+```
+
+### 評決
+* **ドロップイン互換性** - LocoはAxumを使用しており、そのすべての構成要素を保持しているため、既存のAxumコードをそのまま使用できます。
+* **無料のルートメタデータ** - Axumルーターには、現在設定されているルートを記述する機能が欠けていますが、これはリスト化や自動OpenAPIスキーマ生成に使用できます。Locoにはこれをサポートする小さなメタデータレイヤーがあります。`Routes`を使用すると、無料でこれを利用でき、さまざまなシグネチャはAxumルーターと互換性があります。
