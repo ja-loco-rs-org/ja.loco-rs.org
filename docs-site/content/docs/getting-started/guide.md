@@ -13,121 +13,110 @@ top = false
 flair =[]
 +++
 
-## Guide Assumptions
+## ガイドの前提
 
-This is a "long way round" tutorial. It is long and indepth on purpose, it shows you how to build things manually **and** automatically using generators, so that you learn the skills to build and also how things work.
+これは「遠回り」チュートリアルです。意図的に長く詳細にしています。手動での構築方法とジェネレーターを使った自動化の両方を示し、構築スキルと仕組みを学べるようにしています。
 
+### 名前の由来は？
 
-### What's with the name?
+`Loco`という名前は、Railsへの敬意を込めて**loco**motive（機関車）から来ています。また、`locomotive`よりも`loco`の方がタイピングしやすいです :-)。一部の言語では「狂った」という意味もありますが、それが元々の意図ではありません（RustでRailsを作るのは狂っているのか？それは時間が教えてくれるでしょう！）。
 
-The name `Loco` comes from **loco**motive, as a tribute to Rails, and `loco` is easier to type than `locomotive` :-). Also, in some languages it means "crazy" but that was not the original intention (or, is it crazy to build a Rails on Rust? only time will tell!).
+### どれくらいのRustの知識が必要ですか？
 
-### How much Rust do I need to know?
+初心者から中級者レベルのRustに精通している必要があります。Rustプロジェクトのビルド、テスト、実行方法を知っており、`clap`、`regex`、`tokio`、`axum`などの人気ライブラリを使ったことがある必要があります。Locoには複雑なライフタイムやマクロはありません。
 
-You need to be familiar with Rust to a beginner but not more than moderate-beginner level. You need to know how to build, test, and run Rust projects, have used some popular libraries such as `clap`, `regex`, `tokio`, `axum` or other web framework, nothing too fancy. There are no crazy lifetime twisters or complex / too magical, macros in Loco that you need to know how they work.
+### Locoとは何ですか？
 
-
-### What is Loco?
-
-Loco is strongly inspired by Rails. If you know Rails _and_ Rust, you'll feel at home. If you only know Rails and new to Rust, you'll find Loco refreshing. We do not assume you know Rails.
+LocoはRailsに強く影響を受けています。RailsとRustの両方を知っているなら、すぐに馴染むでしょう。Railsだけを知っていてRustは初めてなら、Locoは新鮮に感じるでしょう。Railsを知っていることは前提としていません。
 
 <div class="infobox">
-We think Rails is so great, that this guide is strongly inspired from the <a href="https://guides.rubyonrails.org/getting_started.html">Rails guide, too</a>
+Railsが素晴らしいと思っているので、このガイドも<a href="https://guides.rubyonrails.org/getting_started.html">Railsガイド</a>に強く影響を受けています。
 </div>
 
-Loco is a Web or API framework for Rust. It's also a productivity suite for developers: it contains everything you need while building a hobby or your next startup. It's also strongly inspired by Rails.
+LocoはRust用のWebまたはAPIフレームワークです。また、開発者のための生産性スイートでもあります。趣味や次のスタートアップを構築するために必要なすべてが含まれています。Railsに強く影響を受けています。
 
-- **You have a variant of the MVC model**, which removes the paradox of option. You deal with building your app, not making academic decisions for what abstractions to use.
-- **Fat models, slim controllers**. Models should contain most of your logic and business implementation, controllers should just be a lightweight router that understands HTTP and moves parameters around.
-- **Command line driven** to keep your momentum and flow. Generate stuff over copying and pasting or coding from scratch.
-- **Every task is "infrastructure-ready"**, just plug in your code and wire it in: controllers, models, views, tasks, background jobs, mailers, and more.
-- **Convention over configuration**: decisions are already done for you -- the folder structure matter, configuration shape and values matter, and the way an app is wired matter to how an app operates and for you do be the most effective.
+- **MVCモデルのバリアントを持っています**。オプションのパラドックスを排除します。アプリの構築に集中でき、抽象化の選択に悩むことはありません。
+- **ファットモデル、スリムコントローラー**。モデルにはロジックとビジネス実装の大部分を含め、コントローラーはHTTPを理解し、パラメータを移動する軽量なルーターにします。
+- **コマンドライン駆動**でモメンタムとフローを維持します。コピー＆ペーストやゼロからのコーディングよりも生成を優先します。
+- **すべてのタスクが「インフラ対応」**です。コードをプラグインしてワイヤリングするだけです：コントローラー、モデル、ビュー、タスク、バックグラウンドジョブ、メーラーなど。
+- **設定よりも規約**：決定はすでに行われています。フォルダ構造、設定の形状と値、アプリのワイヤリング方法がアプリの動作に影響し、最も効果的に作業できるようにします。
 
-## Creating a New Loco App
+## 新しいLocoアプリの作成
 
-You can follow this guide for a step-by-step "bottom up" learning, or you can jump and go with the [tour](@/docs/getting-started/tour/index.md) instead for a quicker "top down" intro.
+このガイドに従ってステップバイステップで学ぶこともできますし、[ツアー](@/docs/getting-started/tour/index.md)に飛び込んで、より速い「トップダウン」の紹介を受けることもできます。
 
-### Installing
+### インストール
 
-<!-- <snip id="quick-installation-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo install loco
-cargo install sea-orm-cli # Only when DB is needed
+cargo install sea-orm-cli # DBが必要な場合のみ
 ```
-<!-- </snip> -->
 
+### 新しいLocoアプリの作成
 
-### Creating a new Loco app
+新しいアプリを作成できます（組み込み認証のために「SaaSアプリ」を選択してください）。
 
-Now you can create your new app (choose "SaaS app" for built-in authentication).
-
-<!-- <snip id="loco-cli-new-from-template" inject_from="yaml" template="sh"> -->
 ```sh
 ❯ loco new
-✔ ❯ App name? · myapp
-✔ ❯ What would you like to build? · Saas App with client side rendering
-✔ ❯ Select a DB Provider · Sqlite
-✔ ❯ Select your background worker type · Async (in-process tokio async tasks)
+✔ ❯ アプリ名は？ · myapp
+✔ ❯ 何を構築しますか？ · クライアントサイドレンダリングのSaaSアプリ
+✔ ❯ DBプロバイダーを選択してください · Sqlite
+✔ ❯ バックグラウンドワーカータイプを選択してください · 非同期（インプロセスのtokio非同期タスク）
 
-🚂 Loco app generated successfully in:
+🚂 Locoアプリが正常に生成されました：
 myapp/
 
-- assets: You've selected `clientside` for your asset serving configuration.
+- assets: アセットサービング構成として`clientside`を選択しました。
 
-Next step, build your frontend:
+次のステップ、フロントエンドをビルドします：
   $ cd frontend/
   $ npm install && npm run build
 ```
-<!-- </snip> -->
 
+Locoがデフォルトで作成するものの概要は次のとおりです：
 
-
-Here's a rundown of what Loco creates for you by default:
-
-| File/Folder    | Purpose                                                                                                                                                           |
+| ファイル/フォルダ    | 目的                                                                                                                                                           |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/`         | Contains controllers, models, views, tasks and more                                                                                                               |
-| `app.rs`       | Main component registration point. Wire the important bits here.                                                                                                  |
-| `lib.rs`       | Various rust-specific exports of your components.                                                                                                                 |
-| `bin/`         | Has your `main.rs` file, you don't need to worry about it                                                                                                         |
-| `controllers/` | Contains controllers, all controllers are exported via `mod.rs`                                                                                                   |
-| `models/`      | Contains models, `models/_entities` contains auto-generated SeaORM models, and `models/*.rs` contains your model extension logic, which are exported via `mod.rs` |
-| `views/`       | Contains JSON-based views. Structs which can `serde` and output as JSON through the API.                                                                          |
-| `workers/`     | Has your background workers.                                                                                                                                      |
-| `mailers/`     | Mailer logic and templates, for sending emails.                                                                                                                   |
-| `fixtures/`    | Contains data and automatic fixture loading logic.                                                                                                                |
-| `tasks/`       | Contains your day to day business-oriented tasks such as sending emails, producing business reports, db maintenance, etc.                                         |
-| `tests/`       | Your app-wide tests: models, requests, etc.                                                                                                                       |
-| `config/`      | A stage-based configuration folder: development, test, production                                                                                                 |
+| `src/`         | コントローラー、モデル、ビュー、タスクなどを含みます                                                                                                               |
+| `app.rs`       | 主要なコンポーネントの登録ポイント。重要な部分をここでワイヤリングします。                                                                                                  |
+| `lib.rs`       | コンポーネントのさまざまなRust固有のエクスポート。                                                                                                                 |
+| `bin/`         | `main.rs`ファイルが含まれていますが、心配する必要はありません                                                                                                         |
+| `controllers/` | コントローラーが含まれ、すべてのコントローラーは`mod.rs`を介してエクスポートされます                                                                                                   |
+| `models/`      | モデルが含まれ、`models/_entities`には自動生成されたSeaORMモデルが含まれ、`models/*.rs`にはモデル拡張ロジックが含まれ、`mod.rs`を介してエクスポートされます |
+| `views/`       | JSONベースのビューが含まれています。構造体は`serde`を使用してAPIを通じてJSONとして出力できます。                                                                          |
+| `workers/`     | バックグラウンドワーカーが含まれています。                                                                                                                                      |
+| `mailers/`     | メーラーのロジックとテンプレートが含まれ、メールを送信します。                                                                                                                   |
+| `fixtures/`    | データと自動フィクスチャ読み込みロジックが含まれています。                                                                                                                |
+| `tasks/`       | メール送信、ビジネスレポートの作成、DBメンテナンスなどの日常的なビジネス指向のタスクが含まれています。                                         |
+| `tests/`       | アプリ全体のテスト：モデル、リクエストなど。                                                                                                                       |
+| `config/`      | 開発、テスト、本番のステージベースの設定フォルダ。                                                                                                 |
 
-## Hello, Loco!
+## こんにちは、Loco！
 
-Let's get some responses quickly. For this, we need to start up the server.
+すぐにレスポンスを得るために、サーバーを起動する必要があります。
 
-You can now switch to to `myapp`:
+`myapp`に切り替えます：
 
 ```sh
 $ cd myapp
 ```
 
-### Starting the server
+### サーバーの起動
 
-<!-- <snip id="starting-the-server-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo loco start
 ```
-<!-- </snip> -->
 
-And now, let's see that it's alive:
+そして、動作していることを確認します：
 
 ```sh
 $ curl localhost:5150/_ping
 {"ok":true}
 ```
 
-The built in `_ping` route will tell your load balancer everything is up.
+組み込みの`_ping`ルートは、ロードバランサーにすべてが稼働していることを伝えます。
 
-Let's see that all services that are required are up:
+必要なすべてのサービスが稼働していることを確認します：
 
 ```sh
 $ curl localhost:5150/_health
@@ -135,12 +124,12 @@ $ curl localhost:5150/_health
 ```
 
 <div class="infobox">
-The built in <code>_health</code> route will tell you that you have configured your app properly: it can establish a connection to your Database and Redis instances successfully.
+組み込みの<code>_health</code>ルートは、アプリが正しく構成されていることを確認します：データベースとRedisインスタンスに正常に接続できることを示します。
 </div>
 
-### Say "Hello", Loco
+### "Hello"と言ってみましょう、Loco
 
-Let's add a quick _hello_ response to our service.
+サービスにクイックな_hello_レスポンスを追加しましょう。
 
 ```sh
 $ cargo loco generate controller guide --api
@@ -151,7 +140,7 @@ added: "tests/requests/guide.rs"
 injected: "tests/requests/mod.rs"
 ```
 
-This is the generated controller body:
+これは生成されたコントローラーの本体です：
 
 ```rust
 #![allow(clippy::missing_errors_doc)]
@@ -172,53 +161,50 @@ pub fn routes() -> Routes {
 }
 ```
 
-
-Change the `index` handler body:
+`index`ハンドラの本体を変更します：
 
 ```rust
-// replace
+// 置き換え
     format::empty()
-// with this
+// これに置き換え
     format::text("hello")
 ```
 
-Start the server:
+サーバーを起動します：
 
-<!-- <snip id="starting-the-server-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo loco start
 ```
-<!-- </snip> -->
 
-Now, let's test it out:
+そして、テストします：
 
 ```sh
 $ curl localhost:5150/api/guides
 hello
 ```
 
-Loco has powerful generators, which will make you 10x productive and drive your momentum when building apps.
+Locoには強力なジェネレーターがあり、アプリを構築する際に10倍の生産性を発揮し、モメンタムを維持します。
 
-If you'd like to be entertained for a moment, let's "learn the hard way" and add a new controller manually as well.
+しばらく楽しみたい場合は、「ハードウェイ」を学び、新しいコントローラーを手動で追加してみましょう。
 
-Add a file called `home.rs`, and `pub mod home;` it in `mod.rs`:
+`home.rs`というファイルを追加し、`mod.rs`に`pub mod home;`を追加します：
 
 ```
 src/
   controllers/
     auth.rs
-    home.rs      <--- add this file
+    home.rs      <--- このファイルを追加
     users.rs
-    mod.rs       <--- 'pub mod home;' the module here
+    mod.rs       <--- ここにモジュールを追加
 ```
 
-Next, set up a _hello_ route, this is the contents of `home.rs`:
+次に、_hello_ルートを設定します。これは`home.rs`の内容です：
 
 ```rust
 // src/controllers/home.rs
 use loco_rs::prelude::*;
 
-// _ctx contains your database connection, as well as other app resource that you'll need
+// _ctxにはデータベース接続や他のアプリリソースが含まれています
 async fn hello(State(_ctx): State<AppContext>) -> Result<Response> {
     format::text("ola, mundo")
 }
@@ -228,17 +214,17 @@ pub fn routes() -> Routes {
 }
 ```
 
-Finally, register this new controller routes in `app.rs`:
+最後に、この新しいコントローラールートを`app.rs`に登録します：
 
 ```rust
 src/
   controllers/
   models/
   ..
-  app.rs   <---- look here
+  app.rs   <---- ここを見てください
 ```
 
-Add the following in `routes()`:
+`routes()`に次の内容を追加します：
 
 ```rust
 // in src/app.rs
@@ -249,26 +235,24 @@ impl Hooks for App {
         AppRoutes::with_default_routes()
             .add_route(controllers::guide::routes())
             .add_route(controllers::auth::routes())
-            .add_route(controllers::home::routes()) // <--- add this
+            .add_route(controllers::home::routes()) // <--- ここに追加
     }
 ```
 
-That's it. Kill the server and bring it up again:
+これで完了です。サーバーを停止して再起動します：
 
-<!-- <snip id="starting-the-server-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo loco start
 ```
-<!-- </snip> -->
 
-And hit `/home/hello`:
+そして`/home/hello`にアクセスします：
 
 ```sh
 $ curl localhost:5150/home/hello
 ola, mundo
 ```
 
-You can take a look at all of your routes with:
+すべてのルートを確認するには次のコマンドを使用します：
 
 ```
 $ cargo loco routes
@@ -278,27 +262,27 @@ $ cargo loco routes
 [POST] /api/auth/register
 [POST] /api/auth/reset
 [POST] /api/auth/verify
-[GET] /home/hello      <---- this is our new route!
+[GET] /home/hello      <---- これは新しいルートです！
   ..
   ..
 $
 ```
 
 <div class="infobox">
-The <em>SaaS Starter</em> keeps routes under <code>/api</code> because it is client-side ready and we are using the <code>--api</code> option in scaffolding. <br/>
-When using client-side routing like React Router, we want to separate backend routes from client routes: the browser will use <code>/home</code> but not <code>/api/home</code> which is the backend route, and you can call <code>/api/home</code> from the client with no worries. Nevertheless, the routes: <code>/_health</code> and <code>/_ping</code> are exceptions, they stay at the root.
+<em>SaaSスターター</em>はクライアントサイドルーティングを使用しているため、ルートは<code>/api</code>の下にあります。<br/>
+React Routerのようなクライアントサイドルーティングを使用する場合、バックエンドルートとクライアントルートを分離したいです：ブラウザは<code>/home</code>を使用しますが、<code>/api/home</code>はバックエンドルートであり、クライアントから<code>/api/home</code>を呼び出すことができます。それでも、ルート<code>/_health</code>と<code>/_ping</code>は例外で、ルートに残ります。
 </div>
 
-## MVC and You
+## MVCとあなた
 
-**Traditional MVC (Model-View-Controller) originated in desktop UI programming paradigms.** However, its applicability to web services led to its rapid adoption. MVC's golden era was around the early 2010s, and since then, many other paradigms and architectures have emerged.
+**従来のMVC（モデル-ビュー-コントローラー）はデスクトップUIプログラミングのパラダイムから生まれました。** しかし、その適用性がWebサービスに広がり、急速に採用されました。MVCの黄金時代は2010年代初頭で、それ以来、多くの他のパラダイムやアーキテクチャが登場しました。
 
-**MVC is still a very strong principle and architecture to follow for simplifying projects**, and this is what Loco follows too.
+**MVCはプロジェクトを簡素化するための非常に強力な原則とアーキテクチャです**。これがLocoが従うものです。
 
-Although web services and APIs don't have a concept of a _view_ because they do not generate HTML or UI responses, **we claim _stable_, _safe_ services and APIs indeed has a notion of a view** -- and that is the serialized data, its shape, its compatibility and its version.
+WebサービスやAPIにはHTMLやUIレスポンスの概念がないため、**安定した、安全なサービスやAPIにはビューの概念があると主張します**。それはシリアライズされたデータ、その形状、互換性、バージョンです。
 
 ```
-// a typical loco app contains all parts of MVC
+// 典型的なLocoアプリにはMVCのすべての部分が含まれています
 
 src/
   controllers/
@@ -315,17 +299,17 @@ src/
     mod.rs
 ```
 
-**This is an important _cognitive_ principle**. And the principle claims that you can only create safe, compatible API responses if you treat those as a separate, independently governed _thing_ -- hence the 'V' in MVC, in Loco.
+**これは重要な認知原則です**。この原則は、APIレスポンスを別個に管理されたものとして扱うことで、安全で互換性のあるレスポンスを作成できると主張します。これがLocoにおけるMVCの'V'です。
 
 <div class="infobox">
-Models in Loco carry the same semantics as in Rails: <b>fat models, slim controllers</b>. This means that every time you want to build something -- <em>you reach out to a model</em>.
+LocoのモデルはRailsと同じ意味を持ちます：<b>ファットモデル、スリムコントローラー</b>。つまり、何かを構築したいときは<em>モデルに手を伸ばす</em>ということです。
 </div>
 
-### Generating a model
+### モデルの生成
 
-A model in Loco represents data *and* functionality. Typically the data is stored in your database. Most, if not all, business processes of your applications would be coded on the model (as an Active Record) or as an orchestration of a few models.
+Locoのモデルはデータ*と*機能を表します。通常、データはデータベースに保存されます。アプリケーションのほとんどのビジネスプロセスは、モデル（アクティブレコードとして）または複数のモデルのオーケストレーションとしてコーディングされます。
 
-Let's create a new model called `Article`:
+`Article`という新しいモデルを作成しましょう：
 
 ```sh
 $ cargo loco generate model article title:string content:text
@@ -337,17 +321,17 @@ added: "tests/models/articles.rs"
 injected: "tests/models/mod.rs"
 ```
 
-### Database migrations
+### データベースマイグレーション
 
-**Keeping your schema honest is done with migrations**. A migration is a singular change to your database structure: it can contain complete table additions, modifications, or index creation.
+**スキーマを正直に保つためにはマイグレーションを行います**。マイグレーションはデータベース構造への単一の変更です：完全なテーブル追加、変更、インデックス作成が含まれます。
 
 ```rust
-// this was generated into `migrations/` from the command:
+// このコードは`migrations/`に生成されました：
 //
 // $ cargo loco generate model article title:string content:text
 //
-// it is automatically applied by Loco's migrator framework.
-// you can also apply it manually using the command:
+// Locoのマイグレーターフレームワークによって自動的に適用されます。
+// 手動で適用することもできます：
 //
 // $ cargo loco db migrate
 //
@@ -373,48 +357,50 @@ impl MigrationTrait for Migration {
 }
 ```
 
-You can recreate a complete database **by applying migrations in-series onto a fresh database** -- this is done automatically by Loco's migrator (which is derived from SeaORM).
+Locoのマイグレーター（SeaORMから派生）によって、**新しいデータベースにマイグレーションを連続して適用することで完全なデータベースを再作成できます**。
 
-When generating a new model, Loco will:
+新しいモデルを生成すると、Locoは次のことを行います：
 
-- Generate a new "up" database migration
-- Apply the migration
-- Reflect the entities from database structure and generate back your `_entities` code
+- 新しい「アップ」データベースマイグレーションを生成
+- マイグレーションを適用
+- データベース構造からエンティティを反映し、`_entities`コードを生成
 
-You will find your new model as an entity, synchronized from your database structure in `models/_entities/`:
+新しいモデルは、データベース構造から同期されたエンティティとして`models/_entities/`に見つかります：
 
 ```
 src/models/
 ├── _entities
-│   ├── articles.rs  <-- sync'd from db schema, do not edit
+│   ├── articles.rs  <-- データベーススキーマから同期、編集しないでください
 │   ├── mod.rs
 │   ├── prelude.rs
 │   └── users.rs
-├── articles.rs   <-- generated for you, your logic goes here.
+├── articles.rs   <-- あなたのロジックをここに追加
 ├── mod.rs
 └── users.rs
 ```
 
-### Using `playground` to interact with the database
+### データベースと対話するための`playground`の使用
 
-Your `examples/` folder contains:
+`examples/`フォルダには次のものが含まれています：
 
-- `playground.rs` - a place to try out and experiment with your models and app logic.
+- `playground.rs` - モデルやアプリロジックを試して実験する場所。
 
-Let's fetch data using your models, using `playground.rs`:
+`playground.rs`を使用してモデルを使用してデータを取得しましょう：
+
+以下のマークダウンを自然な日本語に翻訳しました。
 
 ```rust
-// located in examples/playground.rs
-// use this file to experiment with stuff
+// examples/playground.rs にあります
+// このファイルを使って実験を行ってください
 use loco_rs::{cli::playground, prelude::*};
-// to refer to articles::ActiveModel, your imports should look like this:
+// articles::ActiveModel を参照するには、インポートは次のようになります：
 use myapp::{app::App, models::_entities::articles};
 
 #[tokio::main]
 async fn main() -> loco_rs::Result<()> {
     let ctx = playground::<App>().await?;
 
-    // add this:
+    // これを追加します：
     let res = articles::Entity::find().all(&ctx.db).await.unwrap();
     println!("{:?}", res);
 
@@ -423,33 +409,33 @@ async fn main() -> loco_rs::Result<()> {
 
 ```
 
-### Return a list of posts
+### 投稿のリストを返す
 
-In the example, we use the following to return a list:
+この例では、リストを返すために次のように使用します：
 
 ```rust
 let res = articles::Entity::find().all(&ctx.db).await.unwrap();
 ```
 
-To see how to run more queries, go to the [SeaORM docs](https://www.sea-ql.org/SeaORM/docs/next/basic-crud/select/).
+より多くのクエリを実行する方法については、[SeaORM ドキュメント](https://www.sea-ql.org/SeaORM/docs/next/basic-crud/select/)を参照してください。
 
-To execute your playground, run:
+プレイグラウンドを実行するには、次のコマンドを実行します：
 
 ```rust
 $ cargo playground
 []
 ```
 
-Now, let's insert one item:
+次に、アイテムを1つ挿入してみましょう：
 
 ```rust
 async fn main() -> loco_rs::Result<()> {
     let ctx = playground::<App>().await?;
 
-    // add this:
+    // これを追加します：
     let active_model: articles::ActiveModel = articles::ActiveModel {
-        title: Set(Some("how to build apps in 3 steps".to_string())),
-        content: Set(Some("use Loco: https://loco.rs".to_string())),
+        title: Set(Some("3ステップでアプリを構築する方法".to_string())),
+        content: Set(Some("Locoを使う: https://loco.rs".to_string())),
         ..Default::default()
     };
     active_model.insert(&ctx.db).await.unwrap();
@@ -461,14 +447,14 @@ async fn main() -> loco_rs::Result<()> {
 }
 ```
 
-And run the playground again:
+再度プレイグラウンドを実行します：
 
 ```sh
 $ cargo playground
-[Model { created_at: ..., updated_at: ..., id: 1, title: Some("how to build apps in 3 steps"), content: Some("use Loco: https://loco.rs") }]
+[Model { created_at: ..., updated_at: ..., id: 1, title: Some("3ステップでアプリを構築する方法"), content: Some("Locoを使う: https://loco.rs") }]
 ```
 
-We're now ready to plug this into an `articles` controller. First, generate a new controller:
+これで、`articles` コントローラーに接続する準備が整いました。まず、新しいコントローラーを生成します：
 
 ```sh
 $ cargo loco generate controller articles --api
@@ -479,7 +465,7 @@ added: "tests/requests/articles.rs"
 injected: "tests/requests/mod.rs"
 ```
 
-Edit `src/controllers/articles.rs`:
+`src/controllers/articles.rs` を編集します：
 
 ```rust
 #![allow(clippy::unused_async)]
@@ -497,29 +483,27 @@ pub fn routes() -> Routes {
 }
 ```
 
-Now, start the app:
+アプリを起動します：
 
-<!-- <snip id="starting-the-server-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo loco start
 ```
-<!-- </snip> -->
 
-And make a request:
+リクエストを送信します：
 
 ```sh
 $ curl localhost:5150/api/articles
-[{"created_at":"...","updated_at":"...","id":1,"title":"how to build apps in 3 steps","content":"use Loco: https://loco.rs"}]
+[{"created_at":"...","updated_at":"...","id":1,"title":"3ステップでアプリを構築する方法","content":"Locoを使う: https://loco.rs"}]
 ```
 
-## Building a CRUD API
+## CRUD API の構築
 
-Next we'll see how to get a single article, delete, and edit a single article. Getting an article by ID is done using the `Path` extractor from `axum`.
+次に、単一の記事を取得し、削除し、編集する方法を見ていきます。IDによる記事の取得は、`axum` の `Path` エクストラクタを使用して行います。
 
-Replace the contents of `articles.rs` with this:
+`articles.rs` の内容を次のように置き換えます：
 
 ```rust
-// this is src/controllers/articles.rs
+// src/controllers/articles.rs
 
 #![allow(clippy::unused_async)]
 use loco_rs::prelude::*;
@@ -588,60 +572,56 @@ pub fn routes() -> Routes {
 }
 ```
 
-A few items to note:
+いくつかのポイントに注意してください：
 
-- `Params` is a strongly typed required params data holder, and is similar in concept to Rails' _strongparams_, just safer.
-- `Path(id): Path<i32>` extracts the `:id` component from a URL.
-- Order of extractors is important and follows `axum`'s documentation (parameters, state, body).
-- It's always better to create a `load_item` helper function and use it in all singular-item routes.
-- While `use loco_rs::prelude::*` brings in anything you need to build a controller, you should note to import `crate::models::_entities::articles::{ActiveModel, Entity, Model}` as well as `Serialize, Deserialize` for params.
-
+- `Params` は強い型を持つ必須のパラメータデータホルダーで、Rails の _strongparams_ に似ていますが、安全性が向上しています。
+- `Path(id): Path<i32>` は URL から `:id` コンポーネントを抽出します。
+- エクストラクタの順序は重要で、`axum` のドキュメントに従っています（パラメータ、状態、ボディ）。
+- 単一アイテムのルートでは、`load_item` ヘルパー関数を作成し、それを使用するのが常に良いです。
+- `use loco_rs::prelude::*` はコントローラーを構築するために必要なものをすべて持ち込みますが、`crate::models::_entities::articles::{ActiveModel, Entity, Model}` と `Serialize, Deserialize` をインポートすることに注意してください。
 
 <div class="infobox">
-The order of the extractors is important, as changing the order of them can lead to compilation errors. Adding the <code>#[debug_handler]</code> macro to handlers can help by printing out better error messages. More information about extractors can be found in the <a href="https://docs.rs/axum/latest/axum/extract/index.html#the-order-of-extractors">axum documentation</a>.
+エクストラクタの順序は重要で、順序を変更するとコンパイルエラーが発生する可能性があります。ハンドラーに <code>#[debug_handler]</code> マクロを追加すると、より良いエラーメッセージを表示するのに役立ちます。エクストラクタの詳細については、<a href="https://docs.rs/axum/latest/axum/extract/index.html#the-order-of-extractors">axum ドキュメント</a>を参照してください。
 </div>
 
+これで、アプリを起動して動作するか確認できます：
 
-You can now test that it works, start the app:
-
-<!-- <snip id="starting-the-server-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo loco start
 ```
-<!-- </snip> -->
 
-Add a new article:
+新しい記事を追加します：
 
 ```sh
 $ curl -X POST -H "Content-Type: application/json" -d '{
-  "title": "Your Title",
-  "content": "Your Content xxx"
+  "title": "あなたのタイトル",
+  "content": "あなたのコンテンツ xxx"
 }' localhost:5150/api/articles
-{"created_at":"...","updated_at":"...","id":2,"title":"Your Title","content":"Your Content xxx"}
+{"created_at":"...","updated_at":"...","id":2,"title":"あなたのタイトル","content":"あなたのコンテンツ xxx"}
 ```
 
-Get a list:
+リストを取得します：
 
 ```sh
 $ curl localhost:5150/api/articles
-[{"created_at":"...","updated_at":"...","id":1,"title":"how to build apps in 3 steps","content":"use Loco: https://loco.rs"},{"created_at":"...","updated_at":"...","id":2,"title":"Your Title","content":"Your Content xxx"}
+[{"created_at":"...","updated_at":"...","id":1,"title":"3ステップでアプリを構築する方法","content":"Locoを使う: https://loco.rs"},{"created_at":"...","updated_at":"...","id":2,"title":"あなたのタイトル","content":"あなたのコンテンツ xxx"}]
 ```
 
-### Adding a second model
+### 2つ目のモデルを追加する
 
-Let's add another model, this time: `Comment`. We want to create a relation - a comment belongs to a post, and each post can have multiple comments.
+次に、別のモデル「Comment」を追加します。コメントは投稿に属し、各投稿は複数のコメントを持つことができます。
 
-Instead of coding the model and controller by hand, we're going to create a **comment scaffold** which will generate a fully working CRUD API comments. We're also going to use the special `references` type:
+モデルとコントローラーを手動でコーディングする代わりに、完全に動作するCRUD APIコメントを生成する**コメントスキャフォールド**を作成します。また、特別な `references` タイプも使用します：
 
 ```sh
 $ cargo loco generate scaffold comment content:text article:references --api
 ```
 
 <div class="infobox">
-The special <code>references:&lt;table&gt;</code> is also available. For when you want to have a different name for your column.
+特別な <code>references:&lt;table&gt;</code> も使用可能です。異なる列名を持たせたい場合に便利です。
 </div>
 
-If you peek into the new migration, you'll discover a new database relation in the articles table:
+新しいマイグレーションを確認すると、記事テーブルに新しいデータベースリレーションが追加されていることがわかります：
 
 ```rust
       ..
@@ -659,14 +639,13 @@ If you peek into the new migration, you'll discover a new database relation in t
       ..
 ```
 
+次に、APIを次のように変更します：
 
-Now, lets modify our API in the following way:
+1. コメントは浅いルートを通じて追加できます： `POST comments/`
+2. コメントはネストされたルートでのみ取得できます（投稿が存在することを強制）： `GET posts/1/comments`
+3. コメントは更新、単体取得、削除できません。
 
-1. Comments can be added through a shallow route: `POST comments/`
-2. Comments can only be fetched in a nested route (forces a Post to exist): `GET posts/1/comments`
-3. Comments cannot be updated, fetched singular, or deleted
-
-In `src/controllers/comments.rs`, remove unneeded routes and functions:
+`src/controllers/comments.rs` から不要なルートと関数を削除します：
 
 ```rust
 pub fn routes() -> Routes {
@@ -680,23 +659,23 @@ pub fn routes() -> Routes {
 }
 ```
 
-Also adjust the Params & update functions in `src/controllers/comments.rs`, by updating the scaffolded code marked with `<- add this`
+また、`src/controllers/comments.rs` の Params と update 関数を次のように調整します：
 
 ```rust
 pub struct Params {
     pub content: Option<String>,
-    pub article_id: i32, // <- add this
+    pub article_id: i32, // <- これを追加
 }
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
         item.content = Set(self.content.clone());
-        item.article_id = Set(self.article_id.clone()); // <- add this
+        item.article_id = Set(self.article_id.clone()); // <- これを追加
     }
 }
 ```
 
-Now we need to fetch a relation in `src/controllers/articles.rs`. Add the following route:
+次に、`src/controllers/articles.rs` でリレーションを取得する必要があります。次のルートを追加します：
 
 ```rust
 pub fn routes() -> Routes {
@@ -706,10 +685,10 @@ pub fn routes() -> Routes {
 }
 ```
 
-And implement the relation fetching:
+リレーション取得を実装します：
 
 ```rust
-// to refer to comments::Entity, your imports should look like this:
+// comments::Entity を参照するには、インポートは次のようになります：
 use crate::models::_entities::{
     articles::{ActiveModel, Entity, Model},
     comments,
@@ -726,57 +705,55 @@ pub async fn comments(
 ```
 
 <div class="infobox">
-This is called "lazy loading", where we fetch the item first and later its associated relation. Don't worry - there is also a way to eagerly load comments along with an article.
+これは「遅延読み込み」と呼ばれ、最初にアイテムを取得し、その後に関連するリレーションを取得します。心配しないでください - 記事と一緒にコメントを事前に読み込む方法もあります。
 </div>
 
-Now start the app again:
+再度アプリを起動します：
 
-<!-- <snip id="starting-the-server-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo loco start
 ```
-<!-- </snip> -->
 
-Add a comment to Article `1`:
+記事 `1` にコメントを追加します：
 
 ```sh
 $ curl -X POST -H "Content-Type: application/json" -d '{
-  "content": "this rocks",
+  "content": "これは素晴らしい",
   "article_id": 1
 }' localhost:5150/api/comments
-{"created_at":"...","updated_at":"...","id":4,"content":"this rocks","article_id":1}
+{"created_at":"...","updated_at":"...","id":4,"content":"これは素晴らしい","article_id":1}
 ```
 
-And, fetch the relation:
+リレーションを取得します：
 
 ```sh
 $ curl localhost:5150/api/articles/1/comments
-[{"created_at":"...","updated_at":"...","id":4,"content":"this rocks","article_id":1}]
+[{"created_at":"...","updated_at":"...","id":4,"content":"これは素晴らしい","article_id":1}]
 ```
 
-This ends our comprehensive _Guide to Loco_. If you made it this far, hurray!.
+これで、包括的な _Loco ガイド_ が終了します。ここまで来たなら、おめでとうございます！
 
-## Tasks: export data report
+## タスク：データレポートのエクスポート
 
-Real world apps require handling real world situations. Say some of your users or customers require some kind of a report.
+現実のアプリケーションでは、現実の状況を処理する必要があります。ユーザーや顧客の中には、何らかのレポートを要求する人もいるかもしれません。
 
-You can:
+次のようなことができます：
 
-- Connect to your production database, issue ad-hoc SQL queries. Or use some kind of DB tool. _This is unsafe, insecure, prone to errors, and cannot be automated_.
-- Export your data to something like Redshift, or Google, and issue a query there. _This is a waste of resource, insecure, cannot be tested properly, and slow_.
-- Build an admin. _This is time-consuming, and waste_.
-- **Or build an adhoc task in Rust, which is quick to write, type safe, guarded by the compiler, fast, environment-aware, testable, and secure.**
+- 本番データベースに接続し、アドホックSQLクエリを発行します。または、何らかのDBツールを使用します。_これは安全ではなく、不正確で、エラーが発生しやすく、自動化できません_。
+- データをRedshiftやGoogleなどにエクスポートし、そこでクエリを発行します。_これはリソースの無駄で、安全ではなく、正しくテストできず、遅いです_。
+- 管理者を構築します。_これは時間がかかり、無駄です_。
+- **または、Rustでアドホックタスクを構築します。これは迅速に記述でき、型安全で、コンパイラによって保護され、高速で、環境に依存せず、テスト可能で、安全です。**
 
-This is where `cargo loco task` comes in.
+これが `cargo loco task` の出番です。
 
-First, run `cargo loco task` to see current tasks:
+まず、`cargo loco task` を実行して現在のタスクを確認します：
 
 ```sh
 $ cargo loco task
-seed_data		[Task for seeding data]
+seed_data		[データをシードするためのタスク]
 ```
 
-Generate a new task `user_report`
+新しいタスク `user_report` を生成します：
 
 ```sh
 $ cargo loco generate task user_report
@@ -788,10 +765,10 @@ added: "tests/tasks/user_report.rs"
 injected: "tests/tasks/mod.rs"
 ```
 
-In `src/tasks/user_report.rs` you'll see the task that was generated for you. Replace it with following:
+`src/tasks/user_report.rs` には生成されたタスクが表示されます。次のように置き換えます：
 
 ```rust
-// find it in `src/tasks/user_report.rs`
+// `src/tasks/user_report.rs` で見つけます
 
 use loco_rs::prelude::*;
 use loco_rs::task::Vars;
@@ -803,55 +780,54 @@ pub struct UserReport;
 #[async_trait]
 impl Task for UserReport {
     fn task(&self) -> TaskInfo {
-      // description that appears on the CLI
+      // CLI に表示される説明
         TaskInfo {
             name: "user_report".to_string(),
-            detail: "output a user report".to_string(),
+            detail: "ユーザーレポートを出力".to_string(),
         }
     }
 
-    // variables through the CLI:
+    // CLI を通じての変数：
     // `$ cargo loco task name:foobar count:2`
-    // will appear as {"name":"foobar", "count":2} in `vars`
+    // `vars` で {"name":"foobar", "count":2} と表示されます
     async fn run(&self, app_context: &AppContext, vars: &Vars) -> Result<()> {
         let users = users::Entity::find().all(&app_context.db).await?;
         println!("args: {vars:?}");
-        println!("!!! user_report: listing users !!!");
+        println!("!!! user_report: ユーザーのリストを表示 !!!");
         println!("------------------------");
         for user in &users {
-            println!("user: {}", user.email);
+            println!("ユーザー: {}", user.email);
         }
-        println!("done: {} users", users.len());
+        println!("完了: {} ユーザー", users.len());
         Ok(())
     }
 }
 ```
 
-You can modify this task as you see fit. Access the models with `app_context`, or any other environmental resources, and fetch
-variables that were given through the CLI with `vars`.
+このタスクは自由に修正できます。`app_context` や他の環境リソースにアクセスし、CLI から渡された変数を `vars` で取得します。
 
-Running this task is done with:
+このタスクを実行するには、次のコマンドを使用します：
 
 ```rust
 $ cargo loco task user_report var1:val1 var2:val2 ...
 
 args: Vars { cli: {"var1": "val1", "var2": "val2"} }
-!!! user_report: listing users !!!
+!!! user_report: ユーザーのリストを表示 !!!
 ------------------------
-done: 0 users
+完了: 0 ユーザー
 ```
-If you have not added an user before, the report will be empty.
+もし以前にユーザーを追加していなければ、レポートは空になります。
 
-To add an user check out chapter [Registering a New User](/docs/getting-started/tour/#registering-a-new-user) of [A Quick Tour with Loco](/docs/getting-started/tour/).
+ユーザーを追加するには、[新しいユーザーの登録](/docs/getting-started/tour/#registering-a-new-user)をチェックしてください。
 
-Remember: this is environmental, so you write the task once, and then execute in development or production as you wish. Tasks are compiled into the main app binary.
+これは環境に依存するため、タスクを一度記述すれば、開発や本番環境で自由に実行できます。タスクはメインアプリのバイナリにコンパイルされます。
 
-## Authentication: authenticating your requests
+## 認証：リクエストの認証
 
-If you chose the `SaaS App` starter, you should have a fully configured authentication module baked into the app.
-Let's see how to require authentication when **adding comments**.
+`SaaS App` スターターを選択した場合、アプリには完全に構成された認証モジュールが組み込まれているはずです。
+**コメントを追加する際に認証を要求する**方法を見てみましょう。
 
-Go back to `src/controllers/comments.rs` and take a look at the `add` function:
+`src/controllers/comments.rs` に戻り、`add` 関数を確認します：
 
 ```rust
 pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
@@ -861,8 +837,7 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
     format::json(item)
 }
 ```
-
-To require authentication, we need to modify the function signature in this way:
+認証を要求するには、関数のシグネチャを次のように修正する必要があります：
 
 ```rust
 async fn add(
@@ -870,13 +845,14 @@ async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
-    // we only want to make sure it exists
+    // 存在を確認するだけで十分です
     let _current_user = crate::models::users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
 
-    // next, update
-    // homework/bonus: make a comment _actually_ belong to user (user_id)
+    // 次に、更新します
+    // 課題/ボーナス: コメントを実際にユーザーに属させる（user_id）
     let mut item: ActiveModel = Default::default();
     params.update(&mut item);
+    // item.user_id = Set(Some(_current_user.id)); // ここでユーザーIDを設定します
     let item = item.insert(&ctx.db).await?;
     format::json(item)
 }
