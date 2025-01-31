@@ -1,5 +1,5 @@
 +++
-title = "Your Project"
+title = "あなたのプロジェクト"
 description = ""
 date = 2021-05-01T18:10:00+00:00
 updated = 2024-01-07T21:10:00+00:00
@@ -15,9 +15,9 @@ top = false
 flair =[]
 +++
 
-## Driving development with `cargo loco`
+## `cargo loco`による開発の推進
 
-Create your starter app:
+スターターアプリを作成します：
 
 <!-- <snip id="loco-cli-new-from-template" inject_from="yaml" template="sh"> -->
 ```sh
@@ -38,7 +38,7 @@ Next step, build your frontend:
 ```
 <!-- </snip> -->
 
-Now `cd` into your app and try out the various commands:
+次に、アプリに移動して、さまざまなコマンドを試してみてください：
 
 <!-- <snip id="help-command" inject_from="yaml" template="sh"> -->
 ```sh
@@ -73,8 +73,7 @@ Options:
 ```
 <!-- </snip> -->
 
-
-You can now drive your development through the CLI:
+これで、CLIを通じて開発を進めることができます：
 
 ```
 $ cargo loco generate model posts
@@ -83,16 +82,16 @@ $ cargo loco db migrate
 $ cargo loco start
 ```
 
-And running tests or working with Rust is just as you already know:
+Rustを使用してテストを実行したり作業したりするのは、あなたがすでに知っている通りです：
 
 ```
 $ cargo build
 $ cargo test
 ```
 
-### Starting your app
+### アプリの起動
 
-To run you app, run:
+アプリを実行するには、次のコマンドを実行します：
 
 <!-- <snip id="starting-the-server-command" inject_from="yaml" template="sh"> -->
 ```sh
@@ -100,100 +99,97 @@ cargo loco start
 ```
 <!-- </snip> -->
 
-### Background workers
+### バックグラウンドワーカー
 
-Based on your configuration (in `config/`), your workers will know how to operate:
+設定（`config/`内）に基づいて、ワーカーは操作方法を知っています：
 
 ```yaml
 workers:
-  # requires Redis
+  # Redisが必要
   mode: BackgroundQueue
 
-  # can also use:
-  # ForegroundBlocking - great for testing
-  # BackgroundAsync - for same-process jobs, using tokio async
+  # 他にも使用可能：
+  # ForegroundBlocking - テストに最適
+  # BackgroundAsync - 同一プロセスのジョブを使用、tokio非同期を利用
 ```
 
-And now, you can run the actual process in various ways:
+そして、さまざまな方法で実際のプロセスを実行できます：
 
-- `rr start --worker` - run only a worker and process background jobs. This is great for scale. Run one service app with `rr start`, and then run many process based workers with `rr start --worker` distributed on any machine you want.
+- `rr start --worker` - バックグラウンドジョブを処理するためにワーカーのみを実行します。これはスケールに最適です。1つのサービスアプリを`rr start`で実行し、任意のマシンに分散された多くのプロセスベースのワーカーを`rr start --worker`で実行します。
 
-* `rr start --server-and-worker` - will run both a service and a background worker processor in the same unix process. It uses Tokio for executing background jobs. This is great for those cases when you want to run on a single server without too much of an expense or have constrained resources.
+* `rr start --server-and-worker` - サービスとバックグラウンドワーカープロセッサの両方を同じUnixプロセスで実行します。これは、リソースが制約されている場合や単一のサーバーで実行したい場合に最適です。
 
-### Getting your app version
+### アプリのバージョンの取得
 
-Because your app is compiled, and then copied to production, Loco gives you two important operability pieces of information:
+アプリがコンパイルされ、その後本番環境にコピーされるため、Locoは2つの重要な運用情報を提供します：
 
-* Which version is this app, and which GIT SHA was it built from? `cargo loco version`
-* Which Loco version was this app compiled against? `cargo loco --version`
+* このアプリのバージョンと、どのGIT SHAからビルドされたかを表示します。 `cargo loco version`
+* このアプリがどのLocoバージョンに対してコンパイルされたかを表示します。 `cargo loco --version`
 
-Both version strings are parsable and stable so you can use it in integration scripts, monitoring tools and so on.
+これらのバージョン文字列は解析可能で安定しているため、統合スクリプトや監視ツールなどで使用できます。
 
-You can shape your own custom app versioning scheme by overriding the `app_version` hook in your `src/app.rs` file.
+`src/app.rs`ファイル内の`app_version`フックをオーバーライドすることで、独自のカスタムアプリバージョン管理スキームを作成できます。
 
+## スキャフォールドジェネレーターの使用
 
-## Using the scaffold generator
+スキャフォールディングは、アプリケーションの主要コンポーネントを生成するための効率的で迅速な方法です。スキャフォールディングを利用することで、新しいリソースのモデル、ビュー、およびコントローラーを一度に作成できます。
 
-Scaffolding is an efficient and speedy method for generating key components of an application. By utilizing scaffolding, you can create models, views, and controllers for a new resource all in one go.
-
-
-See scaffold command:
+スキャフォールドコマンドを参照してください：
 <!-- <snip id="scaffold-help-command" inject_from="yaml" action="exec" template="sh"> -->
 ```sh
-Generates a CRUD scaffold, model and controller
+CRUDスキャフォールド、モデルおよびコントローラーを生成します
 
-Usage: demo_app-cli generate scaffold [OPTIONS] <NAME> [FIELDS]...
+使用法: demo_app-cli generate scaffold [OPTIONS] <NAME> [FIELDS]...
 
-Arguments:
-  <NAME>       Name of the thing to generate
-  [FIELDS]...  Model fields, eg. title:string hits:int
+引数:
+  <NAME>       生成するものの名前
+  [FIELDS]...  モデルフィールド、例： title:string hits:int
 
-Options:
-  -k, --kind <KIND>                The kind of scaffold to generate [possible values: api, html, htmx]
-      --htmx                       Use HTMX scaffold
-      --html                       Use HTML scaffold
-      --api                        Use API scaffold
-  -e, --environment <ENVIRONMENT>  Specify the environment [default: development]
-  -h, --help                       Print help
-  -V, --version                    Print version
+オプション:
+  -k, --kind <KIND>                生成するスキャフォールドの種類 [可能な値: api, html, htmx]
+      --htmx                       HTMXスキャフォールドを使用
+      --html                       HTMLスキャフォールドを使用
+      --api                        APIスキャフォールドを使用
+  -e, --environment <ENVIRONMENT>  環境を指定 [デフォルト: development]
+  -h, --help                       ヘルプを表示
+  -V, --version                    バージョンを表示
 ```
 <!-- </snip> -->
 
-You can begin by generating a scaffold for the Post resource, which will represent a single blog posting. To accomplish this, open your terminal and enter the following command:
+Postリソースのスキャフォールドを生成して、単一のブログ投稿を表すことができます。これを実行するには、ターミナルを開いて次のコマンドを入力します：
 <!-- <snip id="scaffold-post-command" inject_from="yaml" template="sh"> -->
 ```sh
 cargo loco generate scaffold posts name:string title:string content:text --api
 ```
 <!-- </snip> -->
 
-The scaffold generate command support API, HTML or HTMX by adding `--template` flag to scaffold command.
+スキャフォールド生成コマンドは、`--template`フラグを追加することでAPI、HTML、またはHTMXをサポートします。
 
-### Scaffold file layout
+### スキャフォールドファイルのレイアウト
 
-The scaffold generator will build several files in your application:
+スキャフォールドジェネレーターは、アプリケーション内にいくつかのファイルを構築します：
 
-| File    | Purpose                                                                                                                                    |
+| ファイル    | 目的                                                                                                                                    |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `migration/src/lib.rs`                     |  Include Post migration.                                                                                |
-| `migration/src/m20240606_102031_posts.rs`  | Posts migration.                                                                                        |
-| `src/app.rs`                               | Adding Posts to application router.                                                                     |
-| `src/controllers/mod.rs`                   | Include the Posts controller.                                                                           |
-| `src/controllers/posts.rs`                 | The Posts controller.                                                                                   |
-| `tests/requests/posts.rs`                  | Functional testing.                                                                                     |
-| `src/models/mod.rs`                        | Including Posts model.                                                                                  |
-| `src/models/posts.rs`                      | Posts model,                                                                                            |
-| `src/models/_entities/mod.rs`              | Includes Posts Sea-orm entity model.                                                                    |
-| `src/models/_entities/posts.rs`            | Sea-orm entity model.                                                                                   |
-| `src/views/mod.rs`                         | Including Posts views. only for HTML and HTMX templates.                                                |
-| `src/views/posts.rs`                       | Posts template generator. only for HTML and HTMX templates.                                             |
-| `assets/views/posts/create.html`           | Create post template. only for HTML and HTMX templates.                                                 |
-| `assets/views/posts/edit.html`             | Edit post template. only for HTML and HTMX templates.                                                   |
-| `assets/views/posts/edit.html`             | Edit post template. only for HTML and HTMX templates.                                                   |
-| `assets/views/posts/list.html`             | List post template. only for HTML and HTMX templates.                                                   |
-| `assets/views/posts/show.html`             | Show post template. only for HTML and HTMX templates.                                                   |
+| `migration/src/lib.rs`                     | Postマイグレーションを含める。                                                                                |
+| `migration/src/m20240606_102031_posts.rs`  | Postsマイグレーション。                                                                                        |
+| `src/app.rs`                               | アプリケーションルーターにPostsを追加。                                                                     |
+| `src/controllers/mod.rs`                   | Postsコントローラーを含める。                                                                           |
+| `src/controllers/posts.rs`                 | Postsコントローラー。                                                                                   |
+| `tests/requests/posts.rs`                  | 機能テスト。                                                                                     |
+| `src/models/mod.rs`                        | Postsモデルを含める。                                                                                  |
+| `src/models/posts.rs`                      | Postsモデル。                                                                                            |
+| `src/models/_entities/mod.rs`              | Posts Sea-ormエンティティモデルを含める。                                                                    |
+| `src/models/_entities/posts.rs`            | Sea-ormエンティティモデル。                                                                                   |
+| `src/views/mod.rs`                         | Postsビューを含める。HTMLおよびHTMXテンプレート専用。                                                |
+| `src/views/posts.rs`                       | Postsテンプレートジェネレーター。HTMLおよびHTMXテンプレート専用。                                             |
+| `assets/views/posts/create.html`           | 投稿作成テンプレート。HTMLおよびHTMXテンプレート専用。                                                 |
+| `assets/views/posts/edit.html`             | 投稿編集テンプレート。HTMLおよびHTMXテンプレート専用。                                                   |
+| `assets/views/posts/list.html`             | 投稿リストテンプレート。HTMLおよびHTMXテンプレート専用。                                                   |
+| `assets/views/posts/show.html`             | 投稿表示テンプレート。HTMLおよびHTMXテンプレート専用。                                                   |
 
-## Your app configuration
-By default, loco stores its configuration files in the config/ directory. It provides predefined configurations for three environments:
+## アプリの設定
+デフォルトでは、locoはその設定ファイルを`config/`ディレクトリに保存します。3つの環境に対して事前定義された設定を提供します：
 
 ```
 config/
@@ -202,38 +198,38 @@ config/
   test.yaml
 ```
 
-An environment is picked up automatically based on:
+環境は自動的に次の方法で選択されます：
 
-- A command line flag: `cargo loco start --environment production`, if not given, fallback to
-- `LOCO_ENV` or `RAILS_ENV` or `NODE_ENV`
+- コマンドラインフラグ： `cargo loco start --environment production`、指定されていない場合は
+- `LOCO_ENV`または`RAILS_ENV`または`NODE_ENV`
 
-When nothing is given, the default value is `development`.
+何も指定されていない場合、デフォルト値は`development`です。
 
-The `Loco` framework allows support for custom environments in addition to the default environment. To add a custom environment, create a configuration file with a name matching the environment identifier used in the preceding example.
+`Loco`フレームワークは、デフォルトの環境に加えてカスタム環境のサポートを提供します。カスタム環境を追加するには、前述の例で使用される環境識別子に一致する名前の設定ファイルを作成します。
 
-### Overriding the Default Configuration Path
-To use a custom configuration directory, set the `LOCO_CONFIG_FOLDER` environment variable to the desired folder path. This will instruct `loco` to load configuration files from the specified directory instead of the default `config/` folder.
+### デフォルト設定パスのオーバーライド
+カスタム設定ディレクトリを使用するには、`LOCO_CONFIG_FOLDER`環境変数を希望のフォルダパスに設定します。これにより、locoはデフォルトの`config/`フォルダではなく、指定されたフォルダから設定ファイルを読み込みます。
 
-### Placeholders / variables in config
+### 設定ファイル内のプレースホルダー/変数
 
-It is possible to inject values into a configuration file. In this example, we get a port value from the `NODE_PORT` environment variable:
+設定ファイルに値を注入することが可能です。この例では、`NODE_PORT`環境変数からポート値を取得します：
 
 ```yaml
 # config/development.yaml
-# every configuration file is a valid Tera template
+# すべての設定ファイルは有効なTeraテンプレートです
 server:
-  # Port on which the server will listen. the server binding is 0.0.0.0:{PORT}
+  # サーバーがリッスンするポート。サーバーバインディングは0.0.0.0:{PORT}
   port:  {{/* get_env(name="NODE_PORT", default=5150) */}}
-  # The UI hostname or IP address that mailers will point to.
+  # メーラーが指すUIホスト名またはIPアドレス。
   host: http://localhost
-  # Out of the box middleware configuration. to disable middleware you can changed the `enable` field to `false` of comment the middleware block
+  # デフォルトのミドルウェア構成。ミドルウェアを無効にするには、`enable`フィールドを`false`に変更するか、ミドルウェアブロックをコメントアウトします。
 ```
 
-The [get_env](https://keats.github.io/tera/docs/#get-env) function is part of the Tera template engine. Refer to the [Tera](https://keats.github.io/tera/docs) docs to see what more you can use.
+[get_env](https://keats.github.io/tera/docs/#get-env)関数はTeraテンプレートエンジンの一部です。詳細については、[Tera](https://keats.github.io/tera/docs)のドキュメントを参照してください。
 
-### Example
+### 例
 
-Suppose you want to add a 'qa' environment. Create a `qa.yaml` file in the config folder:
+'qa'環境を追加したいとします。`config`フォルダに`qa.yaml`ファイルを作成します：
 
 ```
 config/
@@ -243,16 +239,16 @@ config/
   qa.yaml
 ```
 
-To run the application using the 'qa' environment, execute the following command:
+アプリケーションを'qa'環境で実行するには、次のコマンドを実行します：
 <!-- <snip id="starting-the-server-command-with-environment-env-var" inject_from="yaml" template="sh"> -->
 ```sh
 LOCO_ENV=qa cargo loco start
 ```
 <!-- </snip> -->
 
-### Settings
+### 設定
 
-The configuration files contain knobs to set up your Loco app. You can also have your custom settings, with the `settings:` section. in `config/development.yaml` add the `settings:` section
+設定ファイルには、Locoアプリを設定するためのノブが含まれています。また、`settings:`セクションを使用して独自の設定を持つこともできます。`config/development.yaml`に`settings:`セクションを追加します：
 <!-- <snip id="configuration-settings" inject_from="code" template="yaml"> -->
 ```yaml
 settings:
@@ -262,10 +258,10 @@ settings:
 ```
 <!-- </snip> -->
 
-These setting will appear in `ctx.config.settings` as `serde_json::Value`. You can create your strongly typed settings by adding a struct:
+これらの設定は、`ctx.config.settings`内の`serde_json::Value`として表示されます。構造体を追加することで、強く型付けされた設定を作成できます：
 
 ```rust
-// put this in src/common/settings.rs
+// これをsrc/common/settings.rsに置く
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Settings {
     pub allow_list: Option<Vec<String>>,
@@ -278,38 +274,32 @@ impl Settings {
 }
 ```
 
-Then, you can access settings from anywhere like this:
-
+次に、次のようにしてどこからでも設定にアクセスできます：
 
 ```rust
-// in controllers, workers, tasks, or elsewhere,
-// as long as you have access to AppContext (here: `ctx`)
+// コントローラー、ワーカー、タスク、または他の場所で、
+// AppContext（ここでは`ctx`）にアクセスできる限り
 
 if let Some(settings) = &ctx.config.settings {
     let settings = common::settings::Settings::from_json(settings)?;
-    println!("allow list: {:?}", settings.allow_list);
+    println!("許可リスト: {:?}", settings.allow_list);
 }
 ```
 
-### Server
+### サーバー
 
+ここでは、`server:`の下にあるインターフェース（リッスンなど）のパラメーターについての詳細な説明があります：
 
+* `port:` 名前が示す通り、ポートを変更するためのものです。主にロードバランサーの背後にいる場合などです。
 
-Here is a detailed description of the interface (listening, etc.) parameters under `server:`:
+* `binding:` IPインターフェースが「バインド」する場所を変更するためのものです。主に、`nginx`のようなロードバランサーの背後にいる場合は、ローカルアドレスにバインドします（LBもそこにある場合）。ただし、「ワールド」（`0.0.0.0`）にバインドすることもできます。設定は、CLI（`-b`フラグを使用）経由で行うことができます。これはRailsが行っていることです。
 
-* `port:` as the name says, for changing ports, mostly when behind a load balancer, etc.
+* `host:` - 「可視性」使用ケースやアウトオブバンド使用ケースのためです。たとえば、現在のサーバーホスト（ドメイン名など）の表示に使用したい場合や、メールのように、サーバーアドレスが「アウトオブバンド」である場合があります。これは、Gmailアカウントを開いたときに、あなたのメールをクリックすると、外部アドレスや可視アドレス（公式ドメイン名など）を指す必要があるためです。
 
-* `binding:` for changing what the IP interface "binds" to, mostly, when you are behind a load balancer like `nginx` you bind to a local address (when the LB is also there). However, you can also bind to "world" (`0.0.0.0`). You can set the binding: field via config, or via the CLI (using the `-b` flag) -- which is what Rails is doing.
+### ロガー
 
-* `host:` - for "visibility" use cases or out-of-band use cases. For example, sometimes you want to display the current server host (in terms of domain name, etc.), which serves for visibility. And sometimes, as in the case of emails -- your server address is "out of band", meaning when I open my gmail account and I have your email -- I have to click what looks like your external address or visible address (official domain name, etc), and not an internal "host" address which is what may be the wrong thing to do (imagine an email link pointing to "http://127.0.0.1/account/verify")
+YAMLファイルの`logger:`セクションのコメント付きフィールド以外に、以下のようなコンテキストがあります：
 
+* `logger.pretty_backtrace` - ノイズのないカラフルなバックトレースを表示し、素晴らしい開発体験を提供します。これは、特定のエラーでバックトレースのキャプチャを有効にするためにプロセスの環境に`RUST_BACKTRACE=1`を強制的に設定します。開発中に有効にし、本番環境では無効にします。本番環境で必要な場合は、コマンドラインで`RUST_BACKTRACE=1`を使用して、特定のエラーのバックトレースを表示します。
 
-
-### Logger
-
-Other than the commented fields in the `logger:` section on your YAML file, here's some more context:
-
-* `logger.pretty_backtrace` - will display colorful backtrace without noise for great development experience. Note that this forcefully sets `RUST_BACKTRACE=1` into the process' env, which enables a (costly) backtrace capture on specific errors. Enable this in development, disable it in production. When needed in production, use `RUST_BACKTRACE=1` ad-hoc in the command line to show it.
-
-
-For all available configuration options [click here](https://docs.rs/loco-rs/latest/loco_rs/config/struct.Config.html)
+すべての利用可能な設定オプションについては、[こちらをクリック](https://docs.rs/loco-rs/latest/loco_rs/config/struct.Config.html)してください。
