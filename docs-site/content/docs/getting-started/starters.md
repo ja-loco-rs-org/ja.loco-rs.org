@@ -81,7 +81,9 @@ SaaSスターターは、フロントエンドクライアントサイドアセ�
         uri: "/static"
         path: "assets/static"
       fallback: "assets/static/404.html"
-    # クライアントサイドアプリ静的構成
+    fallback:
+      enable: false
+    # client side app static config
     # static:
     #   enable: true
     #   must_exist: true
@@ -90,6 +92,8 @@ SaaSスターターは、フロントエンドクライアントサイドアセ�
     #     uri: "/"
     #     path: "frontend/dist"
     #   fallback: "frontend/dist/index.html"
+    # fallback:
+    #   enable: false
 ```
 
 ### REST APIスターター

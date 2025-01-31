@@ -129,20 +129,24 @@ These fields are ignored if you provide them in your migration command.
 For schema data types, you can use the following mapping to understand the schema:
 
 ```rust
-("uuid", "uuid_uniq"),
-("uuid_col", "uuid_null"),
-("uuid_col!", "uuid"),
+("uuid^", "uuid_uniq"),
+("uuid", "uuid_null"),
+("uuid!", "uuid"),
 ("string", "string_null"),
 ("string!", "string"),
 ("string^", "string_uniq"),
 ("text", "text_null"),
 ("text!", "text"),
-("tiny_integer", "tiny_integer_null"),
-("tiny_integer!", "tiny_integer"),
-("tiny_integer^", "tiny_integer_uniq"),
-("small_integer", "small_integer_null"),
-("small_integer!", "small_integer"),
-("small_integer^", "small_integer_uniq"),
+("text^", "text_uniq"),
+("small_unsigned^", "small_unsigned_uniq"),
+("small_unsigned", "small_unsigned_null"),
+("small_unsigned!", "small_unsigned"),
+("big_unsigned^", "big_unsigned"),
+("big_unsigned", "big_unsigned_null"),
+("big_unsigned!", "big_unsigned_uniq"),
+("small_int", "small_integer_null"),
+("small_int!", "small_integer"),
+("small_int^", "small_integer_uniq"),
 ("int", "integer_null"),
 ("int!", "integer"),
 ("int^", "integer_uniq"),
@@ -151,24 +155,47 @@ For schema data types, you can use the following mapping to understand the schem
 ("big_int^", "big_integer_uniq"),
 ("float", "float_null"),
 ("float!", "float"),
+("float^", "float_uniq"),
 ("double", "double_null"),
 ("double!", "double"),
+("double^", "double_uniq"),
 ("decimal", "decimal_null"),
 ("decimal!", "decimal"),
 ("decimal_len", "decimal_len_null"),
 ("decimal_len!", "decimal_len"),
+("decimal^", "decimal_uniq"),
 ("bool", "boolean_null"),
 ("bool!", "boolean"),
 ("tstz", "timestamp_with_time_zone_null"),
 ("tstz!", "timestamp_with_time_zone"),
 ("date", "date_null"),
 ("date!", "date"),
-("ts", "timestamp_null"),
-("ts!", "timestamp"),
+("date^", "date_uniq"),
+("date_time", "date_time_null"),
+("date_time!", "date_time"),
+("date_time^", "date_time_uniq"),
+("blob", "blob_null"),
+("blob!", "blob"),
+("blob^", "blob_uniq"),
 ("json", "json_null"),
 ("json!", "json"),
 ("jsonb", "json_binary_null"),
 ("jsonb!", "json_binary"),
+("jsonb^", "jsonb_uniq"),
+("money", "money_null"),
+("money!", "money"),
+("money^", "money_uniq"),
+("unsigned", "unsigned_null"),
+("unsigned!", "unsigned"),
+("unsigned^", "unsigned_uniq"),
+("binary_len", "binary_len_null"),
+("binary_len!", "binary_len"),
+("binary_len^", "binary_len_uniq"),
+("var_binary", "var_binary_null"),
+("var_binary!", "var_binary"),
+(" array", "array"),
+(" array!", "array"),
+(" array^", "array"),
 ```
 
 Using `user:references` uses the special `references` type, which will create a relationship between a `post` and a `user`, adding a `user_id` reference field to the `posts` table.
@@ -644,8 +671,8 @@ Integrate your seed into the app's Hook implementations by following these steps
 impl Hooks for App {
     // Other implementations...
 
-    async fn seed(db: &DatabaseConnection, base: &Path) -> Result<()> {
-        db::seed::<users::ActiveModel>(db, &base.join("users.yaml").display().to_string()).await?;
+    async fn seed(ctx: &AppContext, base: &Path) -> Result<()> {
+        db::seed::<users::ActiveModel>(&ctx.db, &base.join("users.yaml").display().to_string()).await?;
         Ok(())
     }
 }
@@ -694,7 +721,7 @@ use loco_rs::testing::prelude::*;
 async fn handle_create_with_password_with_duplicate() {
 
     let boot = boot_test::<App, Migrator>().await;
-    seed::<App>(&boot.app_context.db).await.unwrap();
+    seed::<App>(&boot.app_context).await.unwrap();
     assert!(get_user_by_id(1).ok());
 }
 ```
@@ -818,7 +845,7 @@ async fn can_find_by_pid() {
     configure_insta!();
 
     let boot = boot_test::<App, Migrator>().await;
-    seed::<App>(&boot.app_context.db).await.unwrap();
+    seed::<App>(&boot.app_context).await.unwrap();
 
     let existing_user =
         Model::find_by_pid(&boot.app_context.db, "11111111-1111-1111-1111-111111111111").await;
@@ -855,8 +882,8 @@ pub struct App;
 #[async_trait]
 impl Hooks for App {
     //...
-    async fn truncate(db: &DatabaseConnection) -> Result<()> {
-        // truncate_table(db, users::Entity).await?;
+    async fn truncate(ctx: &AppContext) -> Result<()> {
+        // truncate_table(&ctx.db, users::Entity).await?;
         Ok(())
     }
 
@@ -874,7 +901,7 @@ async fn is_user_exists() {
     configure_insta!();
 
     let boot = boot_test::<App, Migrator>().await;
-    seed::<App>(&boot.app_context.db).await.unwrap();
+    seed::<App>(&boot.app_context).await.unwrap();
     assert!(get_user_by_id(1).ok());
 
 }

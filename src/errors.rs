@@ -142,6 +142,7 @@ pub enum Error {
     #[error(transparent)]
     Cache(#[from] crate::cache::CacheError),
 
+    #[cfg(debug_assertions)]
     #[error(transparent)]
     Generators(#[from] loco_gen::Error),
 
@@ -156,6 +157,12 @@ pub enum Error {
 
     #[error(transparent)]
     Any(#[from] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error(transparent)]
+    ValidationError(#[from] validator::ValidationErrors),
+
+    #[error(transparent)]
+    AxumFormRejection(#[from] axum::extract::rejection::FormRejection),
 }
 
 impl Error {
